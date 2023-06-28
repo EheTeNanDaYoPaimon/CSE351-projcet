@@ -64,21 +64,20 @@ def clean_data_by_column(data,feature):
 
 
 
+# ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp',
+#        'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'],
+#       dtype='object')
+def model_by_feature(f1,f2):    
+    input = train_data
 
-def model_by_feature(f1,f2):
-
-    input = clean_data_by_column(train_data,f1)
+    input = clean_data_by_column(input,f1)
     input = clean_data_by_column(input,f2)
 
-
-    Fare_And_Age = input[[f1,f2]]
-    display(Fare_And_Age)
-
-
+    f1_vs_f2 = input[[f1,f2]]
 
     # Data Preparation
     # Assuming X_train_selected contains only 'Fare' and 'Age' columns
-    X_train_selected = Fare_And_Age
+    X_train_selected = f1_vs_f2
     y_train = input['Survived']
 
     # Splitting into training and validation sets
@@ -94,13 +93,16 @@ def model_by_feature(f1,f2):
     accuracy = accuracy_score(y_val, y_pred)
     precision = precision_score(y_val, y_pred)
     recall = recall_score(y_val, y_pred)
-    f1 = f1_score(y_val, y_pred)
+    f1_s = f1_score(y_val, y_pred)
 
     # Print the evaluation metrics
     print("Accuracy:", accuracy)
     print("Precision:", precision)
     print("Recall:", recall)
-    print("F1-score:", f1)
+    print("F1-score:", f1_s)
+
+    plt.figure(figsize=(8,15))
+
 
 
 
@@ -108,31 +110,62 @@ def model_by_feature(f1,f2):
     intercept = logreg.intercept_
 
     # Define the x-axis range for the graph
-    start = min(Fare_And_Age[f1]) 
-    end = max(Fare_And_Age[f1])  
+    start = min(f1_vs_f2[f1]) 
+    end = max(f1_vs_f2[f1])  
     num_points = 100
     x = numpy.linspace(start, end, num_points)
 
     # Calculate the corresponding y-axis values using the logistic function
     y = -(intercept + coefficients[0] * x) / coefficients[1]
-
-    plt.figure(figsize=(8,15))
-
+    # Generate x-axis and y-axis values
+    x_values = numpy.linspace(min(f1_vs_f2[f1]), max(f1_vs_f2[f1]), 100)
+    y_values = numpy.linspace(min(f1_vs_f2[f2]), max(f1_vs_f2[f2]), 100)
     # Plot the decision boundary
-    plt.plot(x, y, color='red', label='Decision Boundary')
+    X, Y = numpy.meshgrid(x_values, y_values)
+    X_flattened = X.flatten().reshape(-1, 1)
+    Y_flattened = Y.flatten().reshape(-1, 1)
+    # Predict the class labels for the meshgrid points
+    labels_pred = logreg.predict(numpy.hstack((X_flattened, Y_flattened)))
 
-    # Plot the data points as a scatter plot
-    plt.scatter(Fare_And_Age['Fare'], Fare_And_Age['Age'], c=input['Survived'], cmap='coolwarm', label='Data Points', s=5)
-    plt.ylim(min(Fare_And_Age['Age']), max(Fare_And_Age['Age']))
+    # Reshape the predicted labels back to the meshgrid shape
+    labels_pred = labels_pred.reshape(X.shape)
+
+    plt.contourf(X, Y, labels_pred, levels=[-1, 0.5, 1], colors=['blue', 'red'], alpha=0.3)
+
+    # plt.plot(X, Y, color='red', label='Decision Boundary')
+    #plot the scatter plot
+    plt.scatter(f1_vs_f2[f1], f1_vs_f2[f2], c=input['Survived'], cmap='coolwarm', label='Data Points', s=5)
+    
+    plt.xlim(min(f1_vs_f2[f1])-1, max(f1_vs_f2[f1])+1)
+    plt.ylim(min(f1_vs_f2[f2])-1, max(f1_vs_f2[f2])+1)
     # Add labels, title, legend, etc. to the plot
-    plt.xlabel('Fare')
-    plt.ylabel('Age')
-    plt.title('Logistic Regression Decision Boundary: Fare vs Age')
-    plt.legend()
+    plt.xlabel(f1)
+    plt.ylabel(f2)
+    plt.title(f'Logistic Regression Decision Boundary: {f1} vs {f2}')
+
+    cbar = plt.colorbar()
+    cbar.set_ticks([0, 1])
+    cbar.set_ticklabels(['Died','Survived'])
 
     # Show the plot
     plt.show()
 
-model_by_feature("Age","Fare")
-model_by_feature("Age","Fare")
+    # # clear the scatter plot
+    # plt.clf()
+
+    # test_input = clean_data_by_column(test_data,f1)
+    # test_input = clean_data_by_column(test_input,f2)
+    # test_values = test_input[[f1,f2]]
+    # plt.scatter(test_values[f1], test_values[f2], c=logreg.predict(test_values), cmap='coolwarm', label='Data Points', s=5)
+    
+    # plt.xlim(min(test_values[f1])-1, max(test_values[f1])+1)
+    # plt.ylim(min(test_values[f2])-1, max(test_values[f2])+1)
+    # # Add labels, title, legend, etc. to the plot
+    # plt.xlabel(f1)
+    # plt.ylabel(f2)
+    # plt.title(f'Logistic Regression Decision Boundary: {f1} vs {f2}')
+
+    # plt.show()
+
+
 model_by_feature("Age","Fare")
