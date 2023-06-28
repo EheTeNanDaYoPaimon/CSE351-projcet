@@ -12,9 +12,6 @@ test_data = pd.read_csv('test.csv')
 train_data = pd.read_csv('train.csv')
 logreg = LogisticRegression()
 
-
-#age vs connection
-#age in box plot
 def non_outlier_bound(values):
     is_nan = numpy.isnan(values)
     values = numpy.array(values)[~is_nan]
@@ -27,33 +24,6 @@ def non_outlier_bound(values):
     upper_bound = q3 + 1.5 * iqr
 
     return lower_bound, upper_bound
-
-# ages = numpy.array(list(train_data["Age"]))
-# bounds = non_outlier_bound(ages)
-# input_survived = train_data.loc[bounds[0] <= train_data["Age"]].loc[train_data["Age"] <= bounds[1]].loc[train_data["Survived"] == 1]
-# input_died = train_data.loc[bounds[0] <= train_data["Age"]].loc[train_data["Age"] <= bounds[1]].loc[train_data["Survived"] == 0]
-# input_survived = input_survived[~numpy.isnan(input_survived["Age"])]
-# input_died = input_died[~numpy.isnan(input_died["Age"])]
-# ages_sp_survived = input_survived[["Age","SibSp","Parch"]]
-# ages_sp_survived = [ages_sp_survived["Age"],ages_sp_survived["SibSp"] + ages_sp_survived["Parch"]]
-# ages_survived = numpy.array(list(ages_sp_survived[0]))
-# sp_survived = numpy.array(list(ages_sp_survived[1]))
-# ages_sp_died = input_died[["Age","SibSp","Parch"]]
-# ages_sp_died = [ages_sp_died["Age"],ages_sp_died["SibSp"] + ages_sp_died["Parch"]]
-# ages_died = numpy.array(list(ages_sp_died[0]))
-# sp_died = numpy.array(list(ages_sp_died[1]))
-
-# plt.figure(figsize=(6, 15))
-
-
-# plt.scatter(sp_survived, ages_survived, color='red', marker='.')
-# plt.scatter(sp_died,ages_died,  color='blue', marker='.')
-
-
-# plt.ylabel('Age')
-# plt.xlabel('Total Number Of Relatives')
-# plt.title('plot')
-
 
 def clean_data_by_column(data,feature):
     column = numpy.array(list(data[feature]))
